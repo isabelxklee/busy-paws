@@ -37,4 +37,12 @@ class Dog < ActiveRecord::Base
         Appointment.make_appointment(selected_dog, walker_name)
     end
 
+    def self.see_dogs_walked(walker_name)
+        walker = Walker.find_by(name: walker_name)
+        walked_dogs = walker.appointments.map { |appointment|
+            appointment.dog.name
+        }
+        puts "These are all the dogs you've walked: #{walked_dogs.join(", ")}!"
+    end
+
 end

@@ -20,7 +20,7 @@ class Walker < ActiveRecord::Base
         when "Cancel an appointment"
 
         when "See all the dogs I've walked"
-            
+            Dog.see_dogs_walked(walker_name)
         when "Exit"
             Walker.exit(walker_name)
         end
