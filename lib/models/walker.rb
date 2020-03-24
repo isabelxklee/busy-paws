@@ -14,7 +14,7 @@ class Walker < ActiveRecord::Base
         when "Walk a dog"
             Dog.see_dogs(walker_name)
         when "See my upcoming appointments"
-            
+            Appointment.see_upcoming_appointments(walker_name)            
         when "Change an appointment"
 
         when "Cancel an appointment"
