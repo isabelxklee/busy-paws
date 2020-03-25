@@ -27,6 +27,10 @@ class Walker < ActiveRecord::Base
         Walker.find_by(name: walker_name)
     end
 
+    def self.id(walker_name)
+        Walker.find_by(name: walker_name).id
+    end
+
     def self.appointments(walker_name)
         Walker.find_walker(walker_name).appointments
     end

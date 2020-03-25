@@ -4,25 +4,33 @@ class Appointment < ActiveRecord::Base
 
     attr_accessor :prompt, :dog_names
 
-    def self.make_appointment(selected_dog, walker_name)
-        @prompt = TTY::Prompt.new
+    def convert_datetime(datetime, format)
+        if format == "bdy"
+            datetime.strftime("%B %d, %Y")
+        elsif format == "imp"
+            datetime.strftime("%I:%M %p")
+        end
+    end
+    # e.g. todays_date = convert_time(Time.now, "bdy")
 
+    def self.todays_date
         todays_date = Time.now.strftime("%B %d, %Y")
         puts "Today's date is #{todays_date}."
-        puts "You can schedule an appointment up to 6 months in advance."
-        
-        appt_date = @prompt.ask("Which date would you like to walk #{selected_dog}? (Example format: May 1, 2020)", convert: :date)
+    end 
 
+    def self.make_appointment(selected_dog, walker_name)
+        @prompt = TTY::Prompt.new
+        Appointment.todays_date
+        
+        puts "You can schedule an appointment up to 6 months in advance."
+        appt_date = @prompt.ask("Which date would you like to walk #{selected_dog}? (example format: May 1, 2020):", convert: :date)
         appt_time = @prompt.ask("What time would you like to walk #{selected_dog}?", convert: :datetime)
 
         Appointment.show_appointment(selected_dog, walker_name, appt_date, appt_time)
     end
 
     def self.show_appointment(selected_dog, walker_name, appt_date, appt_time)
-        dog_id = Dog.find_by(name: selected_dog).id
-        
-        walker_id = Walker.find_walker(walker_name).id
-        Appointment.create(dog_id: dog_id, walker_id: walker_id, date: appt_date, time: appt_time)
+        Appointment.create(dog_id: Dog.id(selected_dog), walker_id: Walker.id(walker_name), date: appt_date, time: appt_time)
 
         puts "Great! #{walker_name}, your dog walking appointment is at #{appt_time.strftime("%I:%M %p")} on #{appt_date.strftime("%D")} with #{selected_dog}."
 

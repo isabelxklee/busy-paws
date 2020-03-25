@@ -6,12 +6,16 @@ class Dog < ActiveRecord::Base
     has_many :walkers, through: :appointments
     attr_accessor :prompt, :appt_date, :appt_time, :dog_names
 
-    def self.dog_age(dog_name)
+    def self.age(dog_name)
         Dog.find_by(name: dog_name).age
     end
 
-    def self.dog_breed(dog_name)
+    def self.breed(dog_name)
         Dog.find_by(name: dog_name).breed
+    end 
+
+    def self.id(dog_name)
+        Dog.find_by(name: dog_name).id
     end 
 
     def self.see_dogs(walker_name)
@@ -36,7 +40,7 @@ class Dog < ActiveRecord::Base
 
     def self.dog_info(walker_name)
         selected_dog = @prompt.select("Which dog would you like to walk?", @dog_names)
-        puts "#{selected_dog} is #{Dog.dog_age(selected_dog)}-years old and a #{Dog.dog_breed(selected_dog)}."
+        puts "#{selected_dog} is #{Dog.age(selected_dog)}-years old and a(n) #{Dog.breed(selected_dog)}."
         Appointment.make_appointment(selected_dog, walker_name)
     end
 
