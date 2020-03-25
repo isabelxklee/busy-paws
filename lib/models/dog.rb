@@ -39,10 +39,16 @@ class Dog < ActiveRecord::Base
 
     def self.see_dogs_walked(walker_name)
         walker = Walker.find_by(name: walker_name)
-        walked_dogs = walker.appointments.map { |appointment|
-            appointment.dog.name
-        }
-        puts "You've walked #{walked_dogs.length} dogs: #{walked_dogs.join(", ")}!"
+        if walker.appointments.length > 0
+            walked_dogs = walker.appointments.map { |appointment|
+                appointment.dog.name
+            }
+
+            puts "You've walked #{walked_dogs.length} dogs: #{walked_dogs.join(", ")}!"
+        else
+            puts "You haven't walked any dogs."
+            Appointment.no_appts(walker_name)
+        end
     end
 
 end

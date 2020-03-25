@@ -16,6 +16,7 @@ GEM
     coderay (1.1.2)
     colorize (0.8.1)
     concurrent-ruby (1.1.5)
+    date (3.0.0)
     equatable (0.6.1)
     faker (2.9.0)
       i18n (>= 1.6, < 1.8)
@@ -67,6 +68,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 5.2)
   colorize
+  date
   faker
   pry
   require_all

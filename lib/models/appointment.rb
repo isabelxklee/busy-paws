@@ -60,48 +60,69 @@ class Appointment < ActiveRecord::Base
         end
     end
 
-    # def self.cancel_appointment(walker_name)
-    #     @prompt = TTY::Prompt.new
-
-    #     walkers_apps = Walker.find_by(name: walker_name).appointments.map { |appointment|
-    #         "#{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
-    #     }
-
-    #     answer = @prompt.select("Which appointment would you like to cancel?", walkers_apps)
-    # end
-
-    ################## SIMPLE WAY OF DOING THIS ########################
-    # def self.cancel_appointment(walker_name)
-    #     @prompt = TTY::Prompt.new
-
-    #     walkers_apps = Walker.find_by(name: walker_name).appointments
-    #     selected_app = @prompt.select("Which appointment would you like to cancel?", walkers_apps)
-    #     puts selected_app
-    #     selected_app.delete
-    #     puts "Your appointment has been cancelled."
-    # end
-
-    ##################### SLIGHTLY MORE COMPLICATED WAY OF DOING THIS #######################
-    # can we identify the appointment with its place in the array of appointments?
-    # user-facing: number the appointments available to them
-    # back-end: delete the correct appointment by subtracting 1 from the user-facing number to find the index in an array of appointments
     def self.cancel_appointment(walker_name)
         @prompt = TTY::Prompt.new
         i=0
         walkers_apps = Walker.find_by(name: walker_name).appointments
-        formatted_list_of_walkers_apps = walkers_apps.map { |appointment|
-            "#{i+=1}. #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
-        }
 
-        selected_app = @prompt.select("Which appointment would you like to cancel?", formatted_list_of_walkers_apps)
+        if walkers_apps.length > 0
+            formatted_list_of_walkers_apps = walkers_apps.map { |appointment|
+                "#{i+=1}. #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
+            }
 
-        # find the correct appointment
-        app_position = selected_app.split('')[0]
-        app_position = app_position.to_i
-        app_position -= 1
-        walkers_apps[app_position].delete
+            selected_app = @prompt.select("Which appointment would you like to cancel?", formatted_list_of_walkers_apps)
 
-        puts "Your appointment has been cancelled."
+            # find the correct appointment
+            app_position = selected_app.split('')[0]
+            app_position = app_position.to_i
+            app_position -= 1
+            walkers_apps[app_position].delete
+
+            puts "Your appointment has been cancelled."
+            Walker.choose_action(walker_name)
+        else
+            puts "You don't have any appointments."
+            Appointment.no_appts(walker_name)
+        end 
+    end
+
+    def self.change_appointment(walker_name)
+        @prompt = TTY::Prompt.new
+        i=0
+        walkers_apps = Walker.find_by(name: walker_name).appointments
+
+        if walkers_apps.length > 0
+            formatted_list_of_walkers_apps = walkers_apps.map { |appointment|
+                "#{i+=1}. #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
+            }
+
+            selected_app = @prompt.select("Which appointment would you like to change?", formatted_list_of_walkers_apps)
+
+            # find the correct appointment
+            app_position = selected_app.split('')[0]
+            app_position = app_position.to_i
+            app_position -= 1
+
+            # update the appointment
+            date_or_time = @prompt.select("Would you like to change the date or the time?", "Date", "Time")
+
+            if date_or_time == "Date"
+                new_date = @prompt.ask("Pick your new date (Example format: May 1, 2020)", convert: :date)
+                walkers_apps[app_position].date = new_date
+                walkers_apps[app_position].save
+                puts "Your updated appointment is at #{walkers_apps[app_position].time.strftime("%I:%M %p")} on #{new_date.strftime("%D")}."
+            else
+                new_time = @prompt.ask("Pick your new time", convert: :datetime)
+                walkers_apps[app_position].time = new_time
+                walkers_apps[app_position].save
+                puts "Your updated appointment is at #{new_time.strftime("%I:%M %p")} on #{walkers_apps[app_position].date.strftime("%D")}."
+            end 
+
+            Walker.choose_action(walker_name)
+        else
+            puts "You don't have any appointments."
+            Appointment.no_appts(walker_name)
+        end 
     end
 
 end
