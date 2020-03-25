@@ -7,8 +7,8 @@ require_all 'lib'
 # ✅read information about the dog i will be walking
 # ✅schedule a dog walking appointment
 # ✅see all my upcoming walks
-# ❌see all the dogs i've walked
-# ❌see how many dogs i've walked
+# ✅see all the dogs i've walked
+# ✅see how many dogs i've walked
 # ❌change my walking appointment
 # ❌cancel my walking appointment
 

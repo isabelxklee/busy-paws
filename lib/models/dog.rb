@@ -42,7 +42,7 @@ class Dog < ActiveRecord::Base
         walked_dogs = walker.appointments.map { |appointment|
             appointment.dog.name
         }
-        puts "These are all the dogs you've walked: #{walked_dogs.join(", ")}!"
+        puts "You've walked #{walked_dogs.length} dogs: #{walked_dogs.join(", ")}!"
     end
 
 end
