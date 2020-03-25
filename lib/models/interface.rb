@@ -1,17 +1,3 @@
-require_relative '../../config/environment'
-require_all 'lib'
-
-# As a User, I want to be able to…
-# ✅login or create an account
-# ✅browse available dogs
-# ✅read information about the dog i will be walking
-# ✅schedule a dog walking appointment
-# ✅see all my upcoming walks
-# ✅see all the dogs i've walked
-# ✅see how many dogs i've walked
-# ❌change my walking appointment
-# ❌cancel my walking appointment
-
 class Interface
     attr_accessor :prompt
 
@@ -22,31 +8,34 @@ class Interface
     end
 
     def login_or_create_account
-         answer = @prompt.select("Would you like to login or create a new account?", "Login", "Create a new account")
+         answer = @prompt.select("Would you like to login or create a new account?", "Login", "Create a new account", "Exit")
 
-        if answer == "Login"
+         case answer
+         when "Login"
             self.login
-        else
+         when "Create a new account"
             self.create_account
-        end
+         when "Exit"
+            Walker.exit
+         end
     end
 
     def login
         walker_name = @prompt.ask("What's your username?", required: true) 
         
-        if Walker.find_by(name: walker_name)
+        if Walker.find_walker(walker_name)
             puts "Welcome back, #{walker_name}!"
             Walker.choose_action(walker_name)
         else
-            puts "Oops, it looks like your username does not exist."
-            answer = @prompt.select("Would you like to create a new account?", "Yes", "No, try logging in again")
+            username_doesnt_exist
+        end
+    end
 
-        if answer == "Yes"
-            self.create_account
-        else
-            self.login
-        end
-        end
+    def username_doesnt_exist
+        puts "Oops, it looks like your username does not exist."
+
+        answer = @prompt.select("Would you like to create a new account?", "Yes", "No, try logging in again")
+        answer == "Yes" ? self.create_account : self.login
     end
 
     def create_account
@@ -55,7 +44,7 @@ class Interface
             q.modify :remove
         end
 
-        if Walker.find_by(name: walker_name)
+        if Walker.find_walker(walker_name)
             puts "Looks like that username is already taken."
             self.create_account
         else
@@ -64,14 +53,4 @@ class Interface
             Walker.choose_action(walker_name)
         end
     end
-
-    # def see_walkers_dogs
-    #     walkers_dogs = Walker.find_by(name: walker_name).dogs
-    #     walkers_dogs = walkers_dogs.all.map { |dog|
-    #         dog.name
-    #     }
-
-    #     puts "Here are all the dogs you've walked: #{walkers_dogs.join(", ")}."
-    # end
-
 end

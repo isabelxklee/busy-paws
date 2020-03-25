@@ -1,6 +1,3 @@
-require_relative '../../config/environment'
-require_all 'lib'
-
 class Walker < ActiveRecord::Base
     has_many :appointments
     has_many :dogs, through: :appointments
@@ -22,11 +19,30 @@ class Walker < ActiveRecord::Base
         when "See all the dogs I've walked"
             Dog.see_dogs_walked(walker_name)
         when "Exit"
-            Walker.exit(walker_name)
+            Walker.exit
         end
     end
 
-    def self.exit(walker_name)
+    def self.find_walker(walker_name)
+        Walker.find_by(name: walker_name)
+    end
+
+    def self.appointments(walker_name)
+        Walker.find_walker(walker_name).appointments
+    end
+
+    def self.num_of_appointments(walker_name)
+        Walker.find_walker(walker_name).appointments.length
+    end
+
+    def self.walkers_dogs(walker_name)
+        walked_dogs = Walker.appointments(walker_name).map { |appointment|
+            appointment.dog.name
+        }.uniq.join(", ")
+        puts "You've walked #{walked_dogs}!"
+    end
+
+    def self.exit
         puts "Thanks for visiting!"
         system 'exit!'
     end

@@ -1,15 +1,23 @@
-require_relative '../../config/environment'
-require_all 'lib'
-
 class Dog < ActiveRecord::Base
+    # require_relative 'module.rb'
+    # include Helper
+
     has_many :appointments
     has_many :walkers, through: :appointments
-    attr_accessor :prompt, :dog_names, :appt_date, :appt_time
+    attr_accessor :prompt, :appt_date, :appt_time, :dog_names
+
+    def self.dog_age(dog_name)
+        Dog.find_by(name: dog_name).age
+    end
+
+    def self.dog_breed(dog_name)
+        Dog.find_by(name: dog_name).breed
+    end 
 
     def self.see_dogs(walker_name)
         @prompt = TTY::Prompt.new
         answer = @prompt.select("Would you like to see all our available dogs?", "Yes", "No")
-
+        
         if answer == "Yes"
             puts "Great! Let's see those pups."
             Dog.all_dogs(walker_name)
@@ -20,9 +28,7 @@ class Dog < ActiveRecord::Base
     end 
 
     def self.all_dogs(walker_name)
-        @dog_names = Dog.all.map { |dog|
-            dog.name
-        }
+        @dog_names = Dog.all.map(&:name)
         puts "Here are all our available dogs: #{@dog_names.join(", ")}"
 
         Dog.dog_info(walker_name)
@@ -30,24 +36,15 @@ class Dog < ActiveRecord::Base
 
     def self.dog_info(walker_name)
         selected_dog = @prompt.select("Which dog would you like to walk?", @dog_names)
-
-        dog_age = Dog.find_by(name: selected_dog).age
-        dog_breed = Dog.find_by(name: selected_dog).breed
-        puts "#{selected_dog} is #{dog_age}-years old and a #{dog_breed}."
-
+        puts "#{selected_dog} is #{Dog.dog_age(selected_dog)}-years old and a #{Dog.dog_breed(selected_dog)}."
         Appointment.make_appointment(selected_dog, walker_name)
     end
 
     def self.see_dogs_walked(walker_name)
-        walker = Walker.find_by(name: walker_name)
-        if walker.appointments.length > 0
-            walked_dogs = walker.appointments.map { |appointment|
-                appointment.dog.name
-            }
-
-            puts "You've walked #{walked_dogs.length} dogs: #{walked_dogs.join(", ")}!"
+        if Walker.num_of_appointments(walker_name) > 0
+            Walker.walkers_dogs(walker_name)
         else
-            puts "You haven't walked any dogs."
+            puts "You haven't walked any dogs yet."
             Appointment.no_appts(walker_name)
         end
     end
