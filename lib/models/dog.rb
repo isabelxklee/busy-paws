@@ -11,10 +11,11 @@ class Dog < ActiveRecord::Base
         answer = @prompt.select("Would you like to see all our available dogs?", "Yes", "No")
 
         if answer == "Yes"
-            puts "Great! Let's see those puppers."
+            puts "Great! Let's see those pups."
             Dog.all_dogs(walker_name)
         else
             puts "Boo hoo."
+            Walker.choose_action(walker_name)
         end
     end 
 
