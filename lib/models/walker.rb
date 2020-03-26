@@ -4,8 +4,7 @@ class Walker < ActiveRecord::Base
     attr_accessor :prompt
 
     def self.choose_action(walker_name)
-        @prompt = TTY::Prompt.new
-        answer = @prompt.select("What would you like to do?", "Walk a dog", "See my upcoming appointments", "Change an appointment", "Cancel an appointment", "See all the dogs I've walked", "Exit")
+        answer = TTY::Prompt.new.select("What would you like to do?", "Walk a dog", "See my upcoming appointments", "Change an appointment", "Cancel an appointment", "See all the dogs I've walked", "Exit")
 
         case answer
         when "Walk a dog"

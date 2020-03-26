@@ -17,8 +17,7 @@ class Dog < ActiveRecord::Base
     end 
 
     def self.see_dogs(walker_name)
-        @prompt = TTY::Prompt.new
-        answer = @prompt.select("Would you like to see all our available dogs?", "Yes", "No")
+        answer = TTY::Prompt.new.select("Would you like to see all our available dogs?", "Yes", "No")
         
         if answer == "Yes"
             puts "Great! Let's see those pups."
@@ -37,7 +36,7 @@ class Dog < ActiveRecord::Base
     end
 
     def self.dog_info(walker_name)
-        selected_dog = @prompt.select("Which dog would you like to walk?", @dog_names)
+        selected_dog = TTY::Prompt.new.select("Which dog would you like to walk?", @dog_names)
         puts "#{selected_dog} is #{Dog.age(selected_dog)}-years old and a(n) #{Dog.breed(selected_dog)}."
 
         Appointment.make_appointment(selected_dog, walker_name)
@@ -46,6 +45,7 @@ class Dog < ActiveRecord::Base
     def self.see_dogs_walked(walker_name)
         if Walker.num_of_appointments(walker_name) > 0
             Walker.walkers_dogs(walker_name)
+            Walker.choose_action(walker_name)
         else
             puts "You haven't walked any dogs yet."
             Appointment.no_appts(walker_name)
