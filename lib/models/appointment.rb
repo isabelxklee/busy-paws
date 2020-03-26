@@ -2,47 +2,54 @@ class Appointment < ActiveRecord::Base
     belongs_to :dog
     belongs_to :walker
 
-    attr_accessor :prompt, :dog_names
+    attr_accessor :prompt, :dog_names, :appt_date, :appt_time, :selected_dog
 
-    def convert_datetime(datetime, format)
+    def self.convert(datetime, format)
         if format == "bdy"
             datetime.strftime("%B %d, %Y")
         elsif format == "imp"
             datetime.strftime("%I:%M %p")
         end
     end
-    # e.g. todays_date = convert_time(Time.now, "bdy")
 
     def self.todays_date
         todays_date = Time.now.strftime("%B %d, %Y")
         puts "Today's date is #{todays_date}."
     end 
 
-    def self.make_appointment(selected_dog, walker_name)
-        @prompt = TTY::Prompt.new
-        Appointment.todays_date
-        
-        puts "You can schedule an appointment up to 6 months in advance."
-        appt_date = @prompt.ask("Which date would you like to walk #{selected_dog}? (example format: May 1, 2020):", convert: :date)
-        appt_time = @prompt.ask("What time would you like to walk #{selected_dog}?", convert: :datetime)
+    def self.get_date
+        puts "Please enter a date in the future (example format: May 1, 2020)."
+        @appt_date = gets.chomp
+        @appt_date = Date.parse(@appt_date).strftime("%B %d, %Y")
+        puts "The date you've selected is #{@appt_date}."
+    end
 
-        Appointment.show_appointment(selected_dog, walker_name, appt_date, appt_time)
+    def self.get_time
+        puts "Please enter a time."
+        @appt_time = gets.chomp
+        @appt_time = Time.parse(@appt_time).strftime("%I:%M %p")
+        puts "The time you've selected is #{@appt_time}."
+    end
+
+    def self.make_appointment(selected_dog, walker_name)
+        Appointment.todays_date
+        Appointment.get_date
+        Appointment.get_time
+
+        Appointment.create(dog_id: Dog.id(@selected_dog), walker_id: Walker.id(walker_name), date: @appt_date, time: @appt_time)
+        Appointment.show_appointment(@selected_dog, walker_name, @appt_date, @appt_time)
     end
 
     def self.show_appointment(selected_dog, walker_name, appt_date, appt_time)
-        Appointment.create(dog_id: Dog.id(selected_dog), walker_id: Walker.id(walker_name), date: appt_date, time: appt_time)
-
-        puts "Great! #{walker_name}, your dog walking appointment is at #{appt_time.strftime("%I:%M %p")} on #{appt_date.strftime("%D")} with #{selected_dog}."
+        puts "Great! #{walker_name}, your dog walking appointment is at #{@appt_time} on #{@appt_date} with #{@selected_dog}."
 
         Walker.choose_action(walker_name)
     end
 
     def self.see_upcoming_appointments(walker_name)
-        walkers_apps = Walker.appointments(walker_name)
-
         if Walker.num_of_appointments(walker_name) > 0
-            walkers_apps.each { |appointment|
-                puts "You are walking #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}." 
+            Walker.appointments(walker_name).each { |appointment|
+                puts "You are walking #{appointment.dog.name} at #{Appointment.convert(appointment.time, "imp")} on #{Appointment.convert(appointment.date, "bdy")}." 
               }
         else 
             puts "You don't have any appointments."
@@ -64,22 +71,26 @@ class Appointment < ActiveRecord::Base
         end
     end
 
+    def self.list_of_appointments(walker_name)
+        i = 0
+        @formatted_list_of_walkers_apps = Walker.appointments(walker_name).map { |appointment|
+            "#{i+=1}. #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
+        }
+    end
+
+    def self.select_appointment(walker_name)
+        Appointment.list_of_appointments(walker_name)
+        selected_app = @prompt.select("Which appointment would you like to cancel?", @formatted_list_of_walkers_apps)
+
+        # find the correct appointment
+        @app_position = selected_app.split('')[0].to_i - 1
+    end
+
     def self.cancel_appointment(walker_name)
         @prompt = TTY::Prompt.new
-        i=0
-        walkers_apps = Walker.appointments(walker_name)
-
         if Walker.num_of_appointments(walker_name) > 0
-            formatted_list_of_walkers_apps = walkers_apps.map { |appointment|
-                "#{i+=1}. #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
-            }
-
-            selected_app = @prompt.select("Which appointment would you like to cancel?", formatted_list_of_walkers_apps)
-
-            # find the correct appointment
-            app_position = selected_app.split('')[0].to_i - 1
-            walkers_apps[app_position].delete
-
+            Appointment.select_appointment(walker_name)
+            Walker.appointments(walker_name)[@app_position].delete
             puts "Your appointment has been cancelled."
             Walker.choose_action(walker_name)
         else
@@ -90,36 +101,20 @@ class Appointment < ActiveRecord::Base
 
     def self.change_appointment(walker_name)
         @prompt = TTY::Prompt.new
-        i=0
-        walkers_apps = Walker.appointments(walker_name)
-
         if Walker.num_of_appointments(walker_name) > 0
-            formatted_list_of_walkers_apps = walkers_apps.map { |appointment|
-                "#{i+=1}. #{appointment.dog.name} at #{appointment.time.strftime("%I:%M %p")} on #{appointment.date.strftime("%D")}"
-            }
-
-            selected_app = @prompt.select("Which appointment would you like to change?", formatted_list_of_walkers_apps)
-
-            # find the correct appointment
-            app_position = selected_app.split('')[0]
-            app_position = app_position.to_i
-            app_position -= 1
+            Appointment.select_appointment(walker_name)
 
             # update the appointment
-            date_or_time = @prompt.select("Would you like to change the date or the time?", "Date", "Time")
+            Appointment.get_date
+            Appointment.get_time
 
-            if date_or_time == "Date"
-                new_date = @prompt.ask("Pick your new date (Example format: May 1, 2020)", convert: :date)
-                walkers_apps[app_position].date = new_date
-                walkers_apps[app_position].save
-                puts "Your updated appointment is at #{walkers_apps[app_position].time.strftime("%I:%M %p")} on #{new_date.strftime("%D")}."
-            else
-                new_time = @prompt.ask("Pick your new time", convert: :datetime)
-                walkers_apps[app_position].time = new_time
-                walkers_apps[app_position].save
-                puts "Your updated appointment is at #{new_time.strftime("%I:%M %p")} on #{walkers_apps[app_position].date.strftime("%D")}."
-            end 
+            # i don't think this part is working
+            # for some reason, the date is not being saved. maybe there's something wrong with @appt_date?
+            Walker.appointments(walker_name)[@app_position].date = @appt_date
+            Walker.appointments(walker_name)[@app_position].time = @appt_time
+            Walker.appointments(walker_name)[@app_position].save
 
+            puts "Your appointment has been updated to #{@appt_time} on #{@appt_date}."
             Walker.choose_action(walker_name)
         else
             puts "You don't have any appointments."

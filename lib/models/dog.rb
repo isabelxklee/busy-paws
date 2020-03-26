@@ -1,6 +1,4 @@
 class Dog < ActiveRecord::Base
-    # require_relative 'module.rb'
-    # include Helper
 
     has_many :appointments
     has_many :walkers, through: :appointments
@@ -41,6 +39,7 @@ class Dog < ActiveRecord::Base
     def self.dog_info(walker_name)
         selected_dog = @prompt.select("Which dog would you like to walk?", @dog_names)
         puts "#{selected_dog} is #{Dog.age(selected_dog)}-years old and a(n) #{Dog.breed(selected_dog)}."
+
         Appointment.make_appointment(selected_dog, walker_name)
     end
 
