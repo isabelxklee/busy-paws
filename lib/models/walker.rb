@@ -18,7 +18,8 @@ class Walker < ActiveRecord::Base
         when "See all the dogs I've walked"
             Dog.see_dogs_walked(walker_name)
         when "Exit"
-            Walker.exit
+            puts "Thanks for visiting!".colorize(:color => :white, :background => :magenta)
+            system 'exit!'
         end
     end
 
@@ -44,10 +45,4 @@ class Walker < ActiveRecord::Base
         }.uniq.join(", ")
         puts "You've walked #{walked_dogs}!"
     end
-
-    def self.exit
-        puts "Thanks for visiting!"
-        system 'exit!'
-    end
-
 end

@@ -4,6 +4,19 @@ class Dog < ActiveRecord::Base
     has_many :walkers, through: :appointments
     attr_accessor :prompt, :appt_date, :appt_time, :dog_names
 
+    def self.happy_dog
+        puts "
+   .-------------.       .    .   *       *   
+   /_/_/_/_/_/_/_/ \         *       .   )    .
+  //_/_/_/_/_/_// _ \ __          .        .   
+ /_/_/_/_/_/_/_/|/ \.' .`-o                    
+  |             ||-'(/ ,--'                    
+  |             ||  _ |                        
+  |             ||'' ||                        
+  |_____________|| |_|L                     
+        ".colorize(:magenta)
+    end
+
     def self.age(dog_name)
         Dog.find_by(name: dog_name).age
     end
@@ -20,10 +33,11 @@ class Dog < ActiveRecord::Base
         answer = TTY::Prompt.new.select("Would you like to see all our available dogs?", "Yes", "No")
         
         if answer == "Yes"
-            puts "Great! Let's see those pups."
+            puts "Great! Let's see those pups.".colorize(:color => :white, :background => :magenta)
+            Dog.happy_dog
             Dog.all_dogs(walker_name)
         else
-            puts "Boo hoo."
+            puts "Boo hoo.".colorize(:yellow)
             Walker.choose_action(walker_name)
         end
     end 
@@ -47,7 +61,7 @@ class Dog < ActiveRecord::Base
             Walker.walkers_dogs(walker_name)
             Walker.choose_action(walker_name)
         else
-            puts "You haven't walked any dogs yet."
+            puts "You haven't walked any dogs yet.".colorize(:yellow)
             Appointment.no_appts(walker_name)
         end
     end
