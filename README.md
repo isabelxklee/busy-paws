@@ -2,6 +2,7 @@ Busy Paws
 ========================
 
 Busy Paws is a CLI app that allows you to book and manage dog walking appointments.
+Built by [Isabel K. Lee](https://www.kleetime.com).
 
 ---
 
@@ -38,8 +39,6 @@ Projects need to be approved prior to launching into them, so take some time to 
 * schema
 * user stories
 
-As you pitch, think about how you would explain your [Minimum Viable Product (MVP)](https://en.wikipedia.org/wiki/Minimum_viable_product). Which user stories are needed to give you a solid base to build off of? Which user stories can be left to later (stretch goals)? Think [skateboard instead of wheel](https://blog.crisp.se/2016/01/25/henrikkniberg/making-sense-of-mvp).
-
-![mvp](https://blog.crisp.se/wp-content/uploads/2016/01/mvp.png)
+As you pitch, think about how you would explain your . Which user stories are needed to give you a solid base to build off of? Which user stories can be left to later (stretch goals)? 
 
 🎊 Good job on making to the end! 🎊
