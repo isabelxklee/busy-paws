@@ -12,19 +12,19 @@ class Walker < ActiveRecord::Base
             Dog.see_dogs(walker_name)
         when "See my upcoming appointments"
             Appointment.see_upcoming_appointments(walker_name)  
-            sleep 3 /2          
+            sleep 1          
         when "Change an appointment"
             Appointment.change_appointment(walker_name)
-            sleep 3 /2
+            sleep 1
         when "Cancel an appointment"
             Appointment.cancel_appointment(walker_name)
-            sleep 3 /2
+            sleep 1
         when "See all the dogs I've walked"
             Dog.see_dogs_walked(walker_name)
-            sleep 3 /2
+            sleep 1
         when "Exit"
-            puts "Thanks for visiting!".colorize(:color => :white, :background => :magenta)
-            sleep 3 /2
+            Interface.goodbye
+            sleep 1
             system 'exit!'
         end
     end
@@ -50,6 +50,6 @@ class Walker < ActiveRecord::Base
             appointment.dog.name
         }.uniq.join(", ")
         puts "You've walked #{walked_dogs}!"
-        sleep 3 /2
+        sleep 1
     end
 end

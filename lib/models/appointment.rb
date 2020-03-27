@@ -21,14 +21,14 @@ class Appointment < ActiveRecord::Base
 
     def self.get_date
         puts "Please enter a date in the future (example format: May 1, 2020).".colorize(:color => :white, :background => :magenta)
-        sleep 3 / 2
+        sleep 1
         @appt_date = gets.chomp
         Appointment.future_date
     end
 
     def self.get_time
         puts "Please enter a time between 8:00 AM and 8:00 PM.".colorize(:color => :white, :background => :magenta)
-        sleep 3 / 2
+        sleep 1
         @appt_time = gets.chomp
         Appointment.time_range
     end
@@ -39,11 +39,11 @@ class Appointment < ActiveRecord::Base
     
         if Time.parse(@appt_time) < Time.parse(start_time)
             puts "Time must be after 8:00 AM.".colorize(:yellow)
-            sleep 3 / 2
+            sleep 1
             Appointment.get_time
         elsif Time.parse(@appt_time) > Time.parse(end_time)
             puts "Time must be before 8:00 PM.".colorize(:yellow)
-            sleep 3 / 2
+            sleep 1
             Appointment.get_time
         else
             @appt_time = Time.parse(@appt_time).strftime("%I:%M %p")
@@ -54,7 +54,7 @@ class Appointment < ActiveRecord::Base
     def self.future_date
         if Date.parse(@appt_date) < Date.today+1
             puts "Date must be in the future.".colorize(:yellow)
-            sleep 3 / 2
+            sleep 1
             Appointment.get_date
         else
             @appt_date = Date.parse(@appt_date).strftime("%B %d, %Y")
@@ -73,7 +73,7 @@ class Appointment < ActiveRecord::Base
 
     def self.show_appointment(selected_dog, walker_name, appt_date, appt_time)
         puts "Great! #{walker_name}, your dog walking appointment is at #{@appt_time} on #{@appt_date} with #{selected_dog}.".colorize(:color => :white, :background => :magenta)
-        sleep 3 / 2
+        sleep 1
         Walker.choose_action(walker_name)
     end
 
@@ -82,7 +82,7 @@ class Appointment < ActiveRecord::Base
             Appointment.appointment_confirmation(walker_name)
         else 
             puts "You don't have any appointments.".colorize(:yellow)
-            sleep 3 / 2
+            sleep 1
             Appointment.no_appts(walker_name)
         end
 
@@ -102,7 +102,7 @@ class Appointment < ActiveRecord::Base
             Dog.see_dogs(walker_name)
         else
             puts "Pick something else to do!"
-            sleep 3 / 2
+            sleep 1
             Walker.choose_action(walker_name)
         end
     end
@@ -116,7 +116,7 @@ class Appointment < ActiveRecord::Base
 
     def self.select_appointment(walker_name)
         Appointment.list_of_appointments(walker_name)
-        sleep 3 / 2
+        sleep 1
         selected_app = @@prompt.select("Which appointment would you like to choose?", @formatted_list_of_walkers_apps)
 
         # find the correct appointment
@@ -128,11 +128,11 @@ class Appointment < ActiveRecord::Base
             Appointment.select_appointment(walker_name)
             Walker.appointments(walker_name)[@app_position].delete
             puts "Your appointment has been cancelled."
-            sleep 3 / 2
+            sleep 1
             Walker.choose_action(walker_name)
         else
             puts "You don't have any appointments.".colorize(:yellow)
-            sleep 3 / 2
+            sleep 1
             Appointment.no_appts(walker_name)
         end 
     end
@@ -148,11 +148,11 @@ class Appointment < ActiveRecord::Base
             Walker.appointments(walker_name)[@app_position].update(time: @appt_time)
 
             puts "Your appointment has been updated to #{@appt_time} on #{@appt_date}."
-            sleep 3 / 2
+            sleep 1
             Walker.choose_action(walker_name)
         else
             puts "You don't have any appointments.".colorize(:yellow)
-            sleep 3 / 2
+            sleep 1
             Appointment.no_appts(walker_name)
         end 
     end
