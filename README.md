@@ -21,13 +21,15 @@ Busy Paws is a CLI app that allows you to book and manage dog walking appointmen
 * See a list of dogs that you've walked
 * Exit
 
-#### Built With
+### Built With
 
 Here are some tools that I used to build Busy Paws:
 
-* TTY::Prompt
-* Colorize
-* Faker
-* Date
+* [TTY::Prompt] (https://github.com/piotrmurach/tty-prompt): an interactive command line prompt
+* [Colorize] (https://github.com/fazibear/colorize):
+* [Faker] (https://github.com/faker-ruby/faker):
+* [Date] (https://github.com/ruby/date):
+* [Text to ASCII Art Generator] (http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20):
+* [ASCII Art Archive] (https://www.asciiart.eu/): 
 
 🐾🐶 Thanks for visiting, hope you enjoyed Busy Paws! 🐶🐾
