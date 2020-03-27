@@ -1,10 +1,11 @@
 class Walker < ActiveRecord::Base
     has_many :appointments
     has_many :dogs, through: :appointments
-    attr_accessor :prompt
+
+    @@prompt = TTY::Prompt.new
 
     def self.choose_action(walker_name)
-        answer = TTY::Prompt.new.select("What would you like to do?", "Walk a dog", "See my upcoming appointments", "Change an appointment", "Cancel an appointment", "See all the dogs I've walked", "Exit")
+        answer = @@prompt.select("What would you like to do?", "Walk a dog", "See my upcoming appointments", "Change an appointment", "Cancel an appointment", "See all the dogs I've walked", "Exit")
 
         case answer
         when "Walk a dog"

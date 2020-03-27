@@ -2,7 +2,9 @@ class Appointment < ActiveRecord::Base
     belongs_to :dog
     belongs_to :walker
 
-    attr_accessor :prompt, :dog_names, :appt_date, :appt_time
+    @@prompt = TTY::Prompt.new
+
+    attr_accessor :dog_names, :appt_date, :appt_time
 
     def self.convert(datetime, format)
         if format == "bdy"
@@ -69,12 +71,6 @@ class Appointment < ActiveRecord::Base
         Appointment.show_appointment(selected_dog, walker_name, @appt_date, @appt_time)
     end
 
-    def self.appointment_confirmation(walker_name)
-        Walker.appointments(walker_name).each { |appointment|
-            puts "You're walking #{appointment.dog.name} at #{Appointment.convert(appointment.time, "imp")} on #{Appointment.convert(appointment.date, "bdy")}."
-                }
-    end
-
     def self.show_appointment(selected_dog, walker_name, appt_date, appt_time)
         puts "Great! #{walker_name}, your dog walking appointment is at #{@appt_time} on #{@appt_date} with #{selected_dog}.".colorize(:color => :white, :background => :magenta)
         sleep 3 / 2
@@ -83,7 +79,7 @@ class Appointment < ActiveRecord::Base
 
     def self.see_upcoming_appointments(walker_name)
         if Walker.num_of_appointments(walker_name) > 0
-            Walker.appointment_confirmation(walker_name)
+            Appointment.appointment_confirmation(walker_name)
         else 
             puts "You don't have any appointments.".colorize(:yellow)
             sleep 3 / 2
@@ -93,8 +89,14 @@ class Appointment < ActiveRecord::Base
         Walker.choose_action(walker_name)
     end
 
+    def self.appointment_confirmation(walker_name)
+        Walker.appointments(walker_name).each { |appointment|
+            puts "You're walking #{appointment.dog.name} at #{Appointment.convert(appointment.time, "imp")} on #{Appointment.convert(appointment.date, "bdy")}."
+                }
+    end
+
     def self.no_appts(walker_name)
-        answer = TTY::Prompt.new.select("Would you like to schedule a dog walking appointment?", "Yes", "No")
+        answer = @@prompt.select("Would you like to schedule a dog walking appointment?", "Yes", "No")
 
         if answer == "Yes"
             Dog.see_dogs(walker_name)
@@ -115,7 +117,7 @@ class Appointment < ActiveRecord::Base
     def self.select_appointment(walker_name)
         Appointment.list_of_appointments(walker_name)
         sleep 3 / 2
-        selected_app = TTY::Prompt.new.select("Which appointment would you like to choose?", @formatted_list_of_walkers_apps)
+        selected_app = @@prompt.select("Which appointment would you like to choose?", @formatted_list_of_walkers_apps)
 
         # find the correct appointment
         @app_position = selected_app.split('')[0].to_i - 1

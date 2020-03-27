@@ -2,7 +2,9 @@ class Dog < ActiveRecord::Base
 
     has_many :appointments
     has_many :walkers, through: :appointments
-    attr_accessor :prompt, :appt_date, :appt_time, :dog_names
+    attr_accessor :appt_date, :appt_time, :dog_names
+
+    @@prompt = TTY::Prompt.new
 
     def self.happy_dog
         puts "
@@ -31,7 +33,7 @@ class Dog < ActiveRecord::Base
 
     def self.see_dogs(walker_name)
         sleep 3 / 2
-        answer = TTY::Prompt.new.select("Would you like to see all our available dogs?", "Yes", "No")
+        answer = @@prompt.select("Would you like to see all our available dogs?", "Yes", "No")
         sleep 3 / 2
         if answer == "Yes"
             puts "Great! Let's see those pups.".colorize(:color => :white, :background => :magenta)
@@ -54,7 +56,7 @@ class Dog < ActiveRecord::Base
     end
 
     def self.dog_info(walker_name)
-        selected_dog = TTY::Prompt.new.select("Which dog would you like to walk?", @dog_names)
+        selected_dog = @@prompt.select("Which dog would you like to walk?", @dog_names)
         sleep 3 / 2
         puts "#{selected_dog} is #{Dog.age(selected_dog)}-years old and a(n) #{Dog.breed(selected_dog)}."
         sleep 3 / 2

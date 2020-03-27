@@ -1,8 +1,7 @@
 class Interface
-    attr_accessor :prompt
+    @@prompt = TTY::Prompt.new
 
     def initialize
-        @prompt = TTY::Prompt.new
         Interface.intro
         puts "Welcome to Busy Paws, the best dog walking app in town!".colorize(:color => :white, :background => :magenta)
         sleep 3 / 2
@@ -42,7 +41,7 @@ class Interface
     end
 
     def login_or_create_account
-         answer = @prompt.select("Would you like to login or create a new account?", "Login", "Create a new account", "Exit")
+         answer = @@prompt.select("Would you like to login or create a new account?", "Login", "Create a new account", "Exit")
 
          case answer
          when "Login"
@@ -57,7 +56,7 @@ class Interface
     end
 
     def login
-        walker_name = @prompt.ask("What's your username?", required: true)
+        walker_name = @@prompt.ask("What's your username?", required: true)
         sleep 3 /2
         
         if Walker.find_walker(walker_name)
@@ -72,12 +71,12 @@ class Interface
     def username_doesnt_exist
         puts "Oops, it looks like your username does not exist.".colorize(:yellow)
         sleep 3 / 2
-        answer = @prompt.select("Would you like to create a new account?", "Yes", "No, try logging in again")
+        answer = @@prompt.select("Would you like to create a new account?", "Yes", "No, try logging in again")
         answer == "Yes" ? self.create_account : self.login
     end
 
     def create_account
-        walker_name = @prompt.ask("What would you like your username to be?") do |q|
+        walker_name = @@prompt.ask("What would you like your username to be?") do |q|
             q.required true
             q.modify :remove
         end
