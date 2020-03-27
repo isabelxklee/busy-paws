@@ -5,6 +5,7 @@ class Interface
         @prompt = TTY::Prompt.new
         Interface.intro
         puts "Welcome to Busy Paws, the best dog walking app in town!".colorize(:color => :white, :background => :magenta)
+        sleep 3 / 2
         self.login_or_create_account
     end
 
@@ -50,15 +51,18 @@ class Interface
             self.create_account
          when "Exit"
             puts "Thanks for visiting!".colorize(:color => :white, :background => :magenta)
+            sleep 3 / 2
             system 'exit!'
          end
     end
 
     def login
-        walker_name = @prompt.ask("What's your username?", required: true) 
+        walker_name = @prompt.ask("What's your username?", required: true)
+        sleep 3 /2
         
         if Walker.find_walker(walker_name)
             puts "Welcome back, #{walker_name}!".colorize(:color => :white, :background => :magenta)
+            sleep 3 / 2
             Walker.choose_action(walker_name)
         else
             username_doesnt_exist
@@ -67,7 +71,7 @@ class Interface
 
     def username_doesnt_exist
         puts "Oops, it looks like your username does not exist.".colorize(:yellow)
-
+        sleep 3 / 2
         answer = @prompt.select("Would you like to create a new account?", "Yes", "No, try logging in again")
         answer == "Yes" ? self.create_account : self.login
     end
@@ -80,10 +84,13 @@ class Interface
 
         if Walker.find_walker(walker_name)
             puts "Looks like that username is already taken.".colorize(:yellow)
+            sleep 3 / 2
             self.create_account
         else
             Walker.create(name: walker_name)
+            sleep 3 /2
             puts "Welcome to Busy Paws, #{walker_name}!".colorize(:color => :white, :background => :magenta)
+            sleep 3 / 2
             Walker.choose_action(walker_name)
         end
     end
